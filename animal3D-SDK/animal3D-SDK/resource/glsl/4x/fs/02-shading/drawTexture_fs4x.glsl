@@ -32,6 +32,8 @@
 
 out vec4 rtFragColor;
 
+in vec4 vtCoord;
+
 void main()
 {
 	// DUMMY OUTPUT: all fragments are OPAQUE WHITE
