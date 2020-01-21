@@ -29,9 +29,9 @@
 //	2) assign vertex color to output color
 
 out vec4 rtFragColor;
-layout (location = 0) in vec4 uColor;
+in vec4 vColor;
 
 void main()
 {
-	rtFragColor = uColor;
+	rtFragColor = vColor;
 }
