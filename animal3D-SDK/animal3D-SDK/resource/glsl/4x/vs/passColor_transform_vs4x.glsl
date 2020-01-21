@@ -32,9 +32,12 @@
 //	5) assign vertex color input to varying
 
 layout (location = 0) in vec4 aPosition;
+layout (location = 3) in vec4 uColor;
+uniform mat4 uMVP;
+out vec4 rtFragColor;
 
 void main()
 {
-	// DUMMY OUTPUT: directly assign input position to output position
-	gl_Position = aPosition;
+	gl_Position = uMVP * aPosition;
+	rtFragColor = uColor;
 }
