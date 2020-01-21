@@ -18,20 +18,23 @@
 	animal3D SDK: Minimal 3D Animation Framework
 	By Daniel S. Buckstein
 	
-	drawColorAttrib_fs4x.glsl
-	Draw color attribute passed from prior stage as varying.
+	drawPhong_multi_fs4x.glsl
+	Draw Phong shading model for multiple lights.
 */
 
 #version 410
 
 // ****TO-DO: 
-//	1) declare varying to receive input vertex color from vertex shader
-//	2) assign vertex color to output color
+//	1) declare uniform variables for textures; see demo code for hints
+//	2) declare uniform variables for lights; see demo code for hints
+//	3) declare inbound varying data
+//	4) implement Phong shading model
+//	Note: test all data and inbound values before using them!
 
 out vec4 rtFragColor;
 
 void main()
 {
-	// DUMMY OUTPUT: all fragments are OPAQUE RED
-	rtFragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	// DUMMY OUTPUT: all fragments are OPAQUE GREEN
+	rtFragColor = vec4(0.0, 1.0, 0.0, 1.0);
 }
