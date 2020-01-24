@@ -34,7 +34,7 @@
 layout (location = 0) in vec4 aPosition;
 layout (location = 3) in vec4 aColor;
 uniform mat4 uMVP;
-out vec4 vColor;
+out vec4 vFragColor;
 
 void main()
 {
