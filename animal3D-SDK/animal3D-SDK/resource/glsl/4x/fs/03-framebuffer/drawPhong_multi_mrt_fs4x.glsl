@@ -39,4 +39,16 @@ void main()
 {
 	// DUMMY OUTPUT: all fragments are OPAQUE GREEN
 	rtFragColor = vec4(0.0, 1.0, 0.0, 1.0);
+	/*
+	kdiffuse = max(0.0, dot(...));
+	ks = max(0.0, dot(...));
+	ks *= ks; // ks^2
+	ks *= ks; // ks^4
+	ks *= ks; // ks^8
+	etc...
+	
+	CELL SHADING STUFF
+	vec2 rampCoord = vec2(kd, 0.0);
+	vec4 finalLightColour = texture(uTex_dm, rampCoord);
+	*/
 }
