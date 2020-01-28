@@ -30,10 +30,8 @@
 
 out vec4 rtFragColor;
 
-uniform vec4 uColor;
-
 void main()
 {
 	// DUMMY OUTPUT: all fragments are OPAQUE WHITE
-	rtFragColor = uColor;
+	rtFragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

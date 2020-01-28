@@ -18,20 +18,23 @@
 	animal3D SDK: Minimal 3D Animation Framework
 	By Daniel S. Buckstein
 	
-	drawColorAttrib_fs4x.glsl
-	Draw color attribute passed from prior stage as varying.
+	drawTexture_coordManip_fs4x.glsl
+	Draw texture sample after manipulating texcoord.
 */
 
 #version 410
 
 // ****TO-DO: 
-//	1) declare varying to receive input vertex color from vertex shader
-//	2) assign vertex color to output color
+//	1) declare uniform variable for texture; see demo code for hints
+//	2) declare inbound varying for texture coordinate
+//	3) modify texture coordinate in some creative way
+//	4) sample texture using modified texture coordinate
+//	5) assign sample to output color
 
 out vec4 rtFragColor;
 
 void main()
 {
-	// DUMMY OUTPUT: all fragments are OPAQUE RED
-	rtFragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	// DUMMY OUTPUT: all fragments are OPAQUE DARK GREY
+	rtFragColor = vec4(0.2, 0.2, 0.2, 1.0);
 }

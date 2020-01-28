@@ -32,16 +32,9 @@
 //	Note: test all data and inbound values before using them!
 
 out vec4 rtFragColor;
-uniform sampler2D uTex_dm;
-uniform vec4 uLightPos;
-uniform vec4 uLightCol;
-
-in vec4 viewPos;
-in vec4 normPos;
-in vec4 vtCoord;
 
 void main()
 {
 	// DUMMY OUTPUT: all fragments are OPAQUE GREEN
-	rtFragColor = texture(uTex_dm, vtCoord.xy);
+	rtFragColor = vec4(0.0, 1.0, 0.0, 1.0);
 }

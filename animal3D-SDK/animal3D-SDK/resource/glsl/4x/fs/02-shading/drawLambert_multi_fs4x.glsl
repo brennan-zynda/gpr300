@@ -32,30 +32,9 @@
 //	Note: test all data and inbound values before using them!
 
 out vec4 rtFragColor;
-uniform sampler2D uTex_dm;
-uniform vec4 uLightPos;
-uniform vec4 uLightCol;
-
-in vec4 viewPos;
-in vec4 normPos;
-in vec4 vtCoord;
-
-float lambertCalc(vec4 N, vec4 L)
-{
-	vec4 normN = normalize(N);
-	vec4 normL = normalize(L);
-	float dotNL = dot(normN, normL);
-	return max(dotNL, 0.0);
-}
 
 void main()
 {
-	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
-	rtFragColor = /*uLightCol * lambertCalc(normPos, uLightPos) */ texture(uTex_dm, vtCoord.xy);
-	
-	// DEBUGGING:
-	//rtFragColor = uLightCol;
-	//rtFragColor = vtCoord;
-	//rtFragColor = normPos;
-	//rtFragColor = viewPos;
+	// DUMMY OUTPUT: all fragments are OPAQUE RED
+	rtFragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
