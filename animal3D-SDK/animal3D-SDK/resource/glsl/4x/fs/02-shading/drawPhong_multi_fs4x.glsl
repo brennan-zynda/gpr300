@@ -42,6 +42,6 @@ in vec4 vtCoord;
 
 void main()
 {
-	// DUMMY OUTPUT: all fragments are OPAQUE GREEN
+	// DUMMY OUTPUT: Just displays textures
 	rtFragColor = texture(uTex_dm, vtCoord.xy);
 }

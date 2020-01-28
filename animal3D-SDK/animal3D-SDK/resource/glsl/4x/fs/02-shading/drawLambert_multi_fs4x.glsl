@@ -42,8 +42,8 @@ in vec4 vtCoord;
 
 float lambertCalc(vec4 N, vec4 L)
 {
-	vec4 normN = normalize(N);
-	vec4 normL = normalize(L);
+	vec3 normN = normalize(N.xyz);
+	vec3 normL = normalize(L.xyz);
 	float dotNL = dot(normN, normL);
 	return max(dotNL, 0.0);
 }
@@ -51,7 +51,12 @@ float lambertCalc(vec4 N, vec4 L)
 void main()
 {
 	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
-	rtFragColor = /*uLightCol * lambertCalc(normPos, uLightPos) */ texture(uTex_dm, vtCoord.xy);
+	float lambert = 0;
+	/*for(int i = 0; i < uLightCt; i++)
+	{
+		lambert = lambert + lambertCalc(normPos, uLightPos[i]);
+	}*/
+	rtFragColor = /*(lambertCalc(normPos, uLightPos) * uLightCol) */ texture(uTex_dm, vtCoord.xy);
 	
 	// DEBUGGING:
 	//rtFragColor = uLightCol;
