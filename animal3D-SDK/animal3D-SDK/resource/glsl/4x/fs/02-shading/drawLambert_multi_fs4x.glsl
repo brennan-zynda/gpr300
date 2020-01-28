@@ -40,10 +40,18 @@ in vec4 viewPos;
 in vec4 normPos;
 in vec4 vtCoord;
 
+float lambertCalc(vec4 N, vec4 L)
+{
+	vec4 normN = normalize(N);
+	vec4 normL = normalize(L);
+	float dotNL = dot(normN, normL);
+	return max(dotNL, 0.0);
+}
+
 void main()
 {
 	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
-	rtFragColor = texture(uTex_dm, vtCoord.xy);
+	rtFragColor = /*uLightCol * lambertCalc(normPos, uLightPos) */ texture(uTex_dm, vtCoord.xy);
 	
 	// DEBUGGING:
 	//rtFragColor = uLightCol;
