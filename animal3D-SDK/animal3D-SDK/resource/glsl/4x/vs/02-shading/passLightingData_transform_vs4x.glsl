@@ -39,8 +39,8 @@
 //		how to handle the texture coordinate
 
 layout (location = 0) in vec4 aPosition;
-layout (location = 2) in vec4 aPosNormal;
-layout (location = 8) in vec4 tCoord;
+layout (location = 2) in vec4 aNorm;
+layout (location = 8) in vec4 aCoord;
 
 uniform mat4 uMV;
 uniform mat4 uP;
@@ -48,8 +48,8 @@ uniform mat4 uMV_nrm;
 uniform mat4 uAtlas;
 
 out vec4 viewPos;
-out vec4 normPos;
-out vec4 vtCoord;
+out vec4 vNorm;
+out vec4 vCoord;
 
 void main()
 {
@@ -60,8 +60,8 @@ void main()
 	gl_Position = uP * viewPos;
 	
 	// Updates normal attribute
-	normPos = uMV_nrm * aPosNormal;
+	vNorm = uMV_nrm * aNorm;
 	
 	// Updates the texture coordinate based upon the Atlas matrix
-	vtCoord = uAtlas * tCoord;
+	vCoord = uAtlas * aCoord;
 }

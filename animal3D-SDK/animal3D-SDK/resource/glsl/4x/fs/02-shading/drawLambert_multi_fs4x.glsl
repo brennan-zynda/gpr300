@@ -32,35 +32,39 @@
 //	Note: test all data and inbound values before using them!
 
 out vec4 rtFragColor;
+
 uniform sampler2D uTex_dm;
-uniform vec4 uLightPos;
-uniform vec4 uLightCol;
+uniform vec4 uLightPos[4];
+uniform vec4 uLightCol[4];
+uniform int uLightCt;
 
 in vec4 viewPos;
-in vec4 normPos;
-in vec4 vtCoord;
+in vec4 vNorm;
+in vec4 vCoord;
 
 float lambertCalc(vec4 N, vec4 L)
 {
-	vec3 normN = normalize(N.xyz);
-	vec3 normL = normalize(L.xyz);
+	vec4 normN = normalize(N);
+	vec4 normL = normalize(L);
 	float dotNL = dot(normN, normL);
-	return max(dotNL, 0.0);
+	return max(0.0, dotNL);
 }
 
 void main()
 {
 	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
-	float lambert = 0;
-	/*for(int i = 0; i < uLightCt; i++)
+	vec4 diffuse = vec4(0.0);
+	for(int i = 0; i < uLightCt; i++)
 	{
-		lambert = lambert + lambertCalc(normPos, uLightPos[i]);
-	}*/
-	rtFragColor = /*(lambertCalc(normPos, uLightPos) * uLightCol) */ texture(uTex_dm, vtCoord.xy);
+		diffuse += (uLightCol[i] * lambertCalc(vNorm, vCoord - uLightPos[i]));
+	}
+	rtFragColor = diffuse * texture(uTex_dm, vCoord.xy);
 	
 	// DEBUGGING:
-	//rtFragColor = uLightCol;
-	//rtFragColor = vtCoord;
-	//rtFragColor = normPos;
+	//rtFragColor = diffuse;
+	//rtFragColor = uLightPos[1];
+	//rtFragColor = uLightCol[1];
+	//rtFragColor = vCoord;
+	//rtFragColor = vNorm;
 	//rtFragColor = viewPos;
 }
