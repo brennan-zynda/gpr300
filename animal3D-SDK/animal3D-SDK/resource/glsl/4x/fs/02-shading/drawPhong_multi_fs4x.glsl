@@ -34,6 +34,7 @@
 out vec4 rtFragColor;
 
 uniform sampler2D uTex_dm;
+uniform sampler2D uTex_sm;
 uniform vec4 uLightPos[4];
 uniform vec4 uLightCol[4];
 uniform int uLightCt;
@@ -50,15 +51,27 @@ float lambertCalc(vec4 N, vec4 L)
 	return max(0.0, dotNL);
 }
 
+float specCalc(vec4 view, vec4 reflect)
+{
+	float spec = pow(max(dot(normalize(view),normalize(reflect)), 0.0),8);
+	return spec;	
+}
+
 void main()
 {
 	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
 	vec4 diffuse = vec4(0.0);
+	vec4 reflectBoi = vec4(0.0);
+	vec4 spec = vec4(0.0);
+	vec4 view = normalize(viewPos - vCoord);
 	for(int i = 0; i < uLightCt; i++)
 	{
 		diffuse += (uLightCol[i] * lambertCalc(vNorm, vCoord - uLightPos[i]));
+		reflectBoi = reflect(vCoord - uLightPos[i], vNorm);
+		spec += specCalc(view, reflectBoi);
 	}
-	rtFragColor = diffuse * texture(uTex_dm, vCoord.xy);
+	
+	rtFragColor = (spec * texture(uTex_sm, vCoord.xy)) + (diffuse * texture(uTex_dm, vCoord.xy));
 	
 	// DEBUGGING:
 	//rtFragColor = diffuse;
