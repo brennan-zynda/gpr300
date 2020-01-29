@@ -35,8 +35,38 @@
 
 out vec4 rtFragColor;
 
+uniform sampler2D uTex_dm;
+uniform vec4 uLightPos[4];
+uniform vec4 uLightCol[4];
+uniform int uLightCt;
+
+in vec4 viewPos;
+in vec4 vNorm;
+in vec4 vCoord;
+
+float lambertCalc(vec4 N, vec4 L)
+{
+	vec4 normN = normalize(N);
+	vec4 normL = normalize(L);
+	float dotNL = dot(normN, normL);
+	return max(0.0, dotNL);
+}
+
 void main()
 {
-	// DUMMY OUTPUT: all fragments are OPAQUE RED
-	rtFragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
+	vec4 diffuse = vec4(0.0);
+	for(int i = 0; i < uLightCt; i++)
+	{
+		diffuse += (uLightCol[i] * lambertCalc(vNorm, vCoord - uLightPos[i]));
+	}
+	rtFragColor = diffuse * texture(uTex_dm, vCoord.xy);
+	
+	// DEBUGGING:
+	//rtFragColor = diffuse;
+	//rtFragColor = uLightPos[1];
+	//rtFragColor = uLightCol[1];
+	//rtFragColor = vCoord;
+	//rtFragColor = vNorm;
+	//rtFragColor = viewPos;
 }
