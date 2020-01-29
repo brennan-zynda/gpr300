@@ -34,16 +34,18 @@
 //	6) correctly transform input texture coordinate by atlas matrix
 
 layout (location = 0) in vec4 aPosition;
-layout (location = 8) in vec4 aTexCoord;
+layout (location = 8) in vec4 tCoord;
 
 uniform mat4 uMVP;
 uniform mat4 uAtlas;
 
-out vec2 vTexCoord;
+out vec4 vtCoord;
 
 void main()
 {
-	// Transforming input position by MVP matrix
+	// Updates position component based on MVP mat4
 	gl_Position = uMVP * aPosition;
-	vTexCoord = vec2(uAtlas * aTexCoord);
+	
+	// Updates the texture coordinate based upon the Atlas matrix
+	vtCoord = uAtlas * tCoord;
 }
