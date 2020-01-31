@@ -39,7 +39,7 @@ layout (location = 8) in vec4 tCoord;
 uniform mat4 uMVP;
 uniform mat4 uAtlas;
 
-out vec4 vtCoord;
+out vec2 vTexCoord;
 
 void main()
 {
@@ -47,5 +47,5 @@ void main()
 	gl_Position = uMVP * aPosition;
 	
 	// Updates the texture coordinate based upon the Atlas matrix
-	vtCoord = uAtlas * tCoord;
+	vTexCoord = (uAtlas * tCoord).xy;
 }

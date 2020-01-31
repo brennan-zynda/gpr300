@@ -54,7 +54,13 @@ void main()
 	
 }
 */
-out vec4 rtFragColor;
+layout (location = 0) out vec4 rtFragColor;
+/*layout (location = ?) out vec4 diffuseMap;
+layout (location = ?) out vec4 specularMap;
+layout (location = ?) out vec4 viewPosMap;
+layout (location = ?) out vec4 normalMap;
+layout (location = ?) out vec4 coordinateMap;
+layout (location = ?) out vec4 sampleTex;*/
 
 uniform sampler2D uTex_dm;
 uniform sampler2D uTex_sm;
@@ -64,19 +70,20 @@ uniform int uLightCt;
 
 in vec4 viewPos;
 in vec4 vNorm;
-in vec4 vCoord;
+in vec2 vTexCoord;
 
 float lambertCalc(vec4 N, vec4 L)
 {
-	vec4 normN = normalize(N);
-	vec4 normL = normalize(L);
-	float dotNL = dot(normN, normL);
+	float dotNL = dot(N, L);
 	return max(0.0, dotNL);
 }
 
-float specCalc(vec4 view, vec4 reflect)
+float specCalc(vec4 view, vec4 reflectBoi)
 {
-	float spec = pow(max(dot(normalize(view),normalize(reflect)), 0.0),8);
+	float spec = max(dot(view,reflectBoi), 0.0);
+	spec *= spec; // ^2
+	spec *= spec; // ^4
+	spec *= spec; // ^8
 	return spec;	
 }
 
@@ -86,15 +93,25 @@ void main()
 	vec4 diffuse = vec4(0.0);
 	vec4 reflectBoi = vec4(0.0);
 	vec4 spec = vec4(0.0);
-	vec4 view = normalize(viewPos - vCoord);
+	vec4 view = normalize(viewPos - vec4(vTexCoord,0.0,1.0));
+	vec4 vNormNorm = normalize(vNorm);
 	for(int i = 0; i < uLightCt; i++)
 	{
-		diffuse += (uLightCol[i] * lambertCalc(vNorm, vCoord - uLightPos[i]));
-		reflectBoi = reflect(vCoord - uLightPos[i], vNorm);
+		diffuse += (uLightCol[i] * lambertCalc(vNormNorm, uLightPos[i] - viewPos));
+		reflectBoi = normalize(reflect(viewPos - uLightPos[i], vNormNorm));
 		spec += specCalc(view, reflectBoi);
 	}
+	vec4 sampleDiffuseTex = texture(uTex_dm, vTexCoord);
+	vec4 sampleSpecTex = texture(uTex_sm, vTexCoord);
+	rtFragColor = (spec * sampleSpecTex) + (diffuse * sampleDiffuseTex);
 	
-	rtFragColor = (spec * texture(uTex_sm, vCoord.xy)) + (diffuse * texture(uTex_dm, vCoord.xy));
+	// Assigning each display target variable
+	/*diffuseMap = diffuse;
+	specularMap = spec;
+	viewPosMap = viewPos;
+	normalMap = vNorm;
+	coordinateMap = vTexCoord;
+	sampleTex = sampleDiffuseTex;*/
 	
 	// DEBUGGING:
 	//rtFragColor = diffuse;
