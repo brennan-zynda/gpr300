@@ -45,15 +45,13 @@ in vec4 vCoord;
 
 float lambertCalc(vec4 N, vec4 L)
 {
-	vec4 normN = normalize(N);
-	vec4 normL = normalize(L);
-	float dotNL = dot(normN, normL);
+	float dotNL = dot(N, L);
 	return max(0.0, dotNL);
 }
 
-float specCalc(vec4 view, vec4 reflect)
+float specCalc(vec4 view, vec4 reflectBoi)
 {
-	float spec = pow(max(dot(normalize(view),normalize(reflect)), 0.0),8);
+	float spec = pow(max(dot(view,reflectBoi), 0.0),32);
 	return spec;	
 }
 
@@ -63,11 +61,12 @@ void main()
 	vec4 diffuse = vec4(0.0);
 	vec4 reflectBoi = vec4(0.0);
 	vec4 spec = vec4(0.0);
-	vec4 view = normalize(viewPos - vCoord);
+	vec4 view = normalize(viewPos);
+	vec4 vNormNorm = normalize(vNorm);
 	for(int i = 0; i < uLightCt; i++)
 	{
-		diffuse += (uLightCol[i] * lambertCalc(vNorm, vCoord - uLightPos[i]));
-		reflectBoi = reflect(vCoord - uLightPos[i], vNorm);
+		diffuse += (uLightCol[i] * lambertCalc(vNormNorm, normalize(uLightPos[i] - viewPos)));
+		reflectBoi = normalize(reflect(viewPos - uLightPos[i], vNorm));
 		spec += specCalc(view, reflectBoi);
 	}
 	
@@ -75,6 +74,7 @@ void main()
 	
 	// DEBUGGING:
 	//rtFragColor = diffuse;
+	//rtFragColor = spec;
 	//rtFragColor = uLightPos[1];
 	//rtFragColor = uLightCol[1];
 	//rtFragColor = vCoord;
