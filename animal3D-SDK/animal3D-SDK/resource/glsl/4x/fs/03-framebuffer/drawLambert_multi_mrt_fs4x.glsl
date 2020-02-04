@@ -34,20 +34,20 @@
 //	6) declare render targets for each attribute and shading component
 
 layout (location = 0) out vec4 rtFragColor;
-layout (location = 4) out vec4 diffuseMap;
+layout (location = 6) out vec4 diffuseTotal;
 layout (location = 1) out vec4 viewPosMap;
 layout (location = 2) out vec4 normalMap;
 layout (location = 3) out vec4 coordinateMap;
-layout (location = 6) out vec4 diffuseTotal;
+layout (location = 4) out vec4 diffuseMap;
 
 uniform sampler2D uTex_dm;
 uniform vec4 uLightPos[4];
 uniform vec4 uLightCol[4];
 uniform int uLightCt;
 
-in vec4 viewPos;
-in vec4 vNorm;
-layout (location = 3) in vec4 vCoord;
+layout (location = 0) in vec4 viewPos;
+layout (location = 1) in vec4 vNorm;
+layout (location = 2) in vec4 vCoord;
 
 float lambertCalc(vec4 N, vec4 L)
 {
@@ -60,13 +60,16 @@ float lambertCalc(vec4 N, vec4 L)
 void main()
 {
 	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
-	diffuseMap = vec4(0.0);
+	diffuseTotal = vec4(0.0);
 	for(int i = 0; i < uLightCt; i++)
 	{
-		diffuseMap += (uLightCol[i] * lambertCalc(vNorm, vCoord - uLightPos[i]));
+		diffuseTotal += (uLightCol[i] * lambertCalc(vNorm, vCoord - uLightPos[i]));
 	}
-	rtFragColor = diffuseMap * texture(uTex_dm, vCoord.xy);
-	diffuseTotal = rtFragColor;
+	diffuseMap = texture(uTex_dm, vCoord.xy);
+	rtFragColor = diffuseTotal * diffuseMap;
+	viewPosMap = viewPos;
+	normalMap = vNorm;
+	coordinateMap = vCoord;
 	
 	// DEBUGGING:
 	//rtFragColor = diffuse;
