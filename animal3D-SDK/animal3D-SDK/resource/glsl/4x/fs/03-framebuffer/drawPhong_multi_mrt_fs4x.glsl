@@ -33,34 +33,13 @@
 //	5) set location of final color render target (location 0)
 //	6) declare render targets for each attribute and shading component
 
-/*
-out vec4 rtFragColor;
 
-void main()
-{
-	// DUMMY OUTPUT: all fragments are OPAQUE GREEN
-	rtFragColor = vec4(0.0, 1.0, 0.0, 1.0);
-	
-	kdiffuse = max(0.0, dot(...));
-	ks = max(0.0, dot(...));
-	ks *= ks; // ks^2
-	ks *= ks; // ks^4
-	ks *= ks; // ks^8
-	etc...
-	
-	CELL SHADING STUFF
-	vec2 rampCoord = vec2(kd, 0.0);
-	vec4 finalLightColour = texture(uTex_dm, rampCoord);
-	
-}
-*/
 layout (location = 0) out vec4 rtFragColor;
-/*layout (location = ?) out vec4 diffuseMap;
-layout (location = ?) out vec4 specularMap;
-layout (location = ?) out vec4 viewPosMap;
-layout (location = ?) out vec4 normalMap;
-layout (location = ?) out vec4 coordinateMap;
-layout (location = ?) out vec4 sampleTex;*/
+layout (location = 4) out vec4 diffuseMap;
+layout (location = 5) out vec4 specularMap;
+layout (location = 1) out vec4 viewPosMap;
+layout (location = 2) out vec4 normalMap;
+layout (location = 3) out vec4 coordinateMap;
 
 uniform sampler2D uTex_dm;
 uniform sampler2D uTex_sm;
@@ -70,7 +49,7 @@ uniform int uLightCt;
 
 in vec4 viewPos;
 in vec4 vNorm;
-in vec2 vTexCoord;
+layout (location = 3) in vec2 vTexCoord;
 
 float lambertCalc(vec4 N, vec4 L)
 {
@@ -106,12 +85,12 @@ void main()
 	rtFragColor = (spec * sampleSpecTex) + (diffuse * sampleDiffuseTex);
 	
 	// Assigning each display target variable
-	/*diffuseMap = diffuse;
+	diffuseMap = diffuse;
 	specularMap = spec;
 	viewPosMap = viewPos;
 	normalMap = vNorm;
-	coordinateMap = vTexCoord;
-	sampleTex = sampleDiffuseTex;*/
+	//coordinateMap = vTexCoord;
+	/*sampleTex = sampleDiffuseTex;*/
 	
 	// DEBUGGING:
 	//rtFragColor = diffuse;
