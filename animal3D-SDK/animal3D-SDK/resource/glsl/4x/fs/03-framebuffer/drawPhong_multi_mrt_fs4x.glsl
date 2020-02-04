@@ -49,9 +49,9 @@ uniform vec4 uLightPos[4];
 uniform vec4 uLightCol[4];
 uniform int uLightCt;
 
-in vec4 viewPos;
-in vec4 vNorm;
-layout (location = 3) in vec2 vTexCoord;
+layout (location = 0) in vec4 viewPos;
+layout (location = 1) in vec4 vNorm;
+layout (location = 2) in vec4 vTexCoord;
 
 float lambertCalc(vec4 N, vec4 L)
 {
@@ -71,30 +71,26 @@ float specCalc(vec4 view, vec4 reflectBoi)
 void main()
 {
 	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
-	vec4 diffuse = vec4(0.0);
+	diffuseTotal = vec4(0.0);
 	vec4 reflectBoi = vec4(0.0);
-	vec4 spec = vec4(0.0);
-	vec4 view = normalize(viewPos - vec4(vTexCoord,0.0,1.0));
+	specularTotal = vec4(0.0);
+	vec4 view = normalize(viewPos - vTexCoord);
 	vec4 vNormNorm = normalize(vNorm);
 	for(int i = 0; i < uLightCt; i++)
 	{
-		diffuse += (uLightCol[i] * lambertCalc(vNormNorm, uLightPos[i] - viewPos));
+		diffuseTotal += (uLightCol[i] * lambertCalc(vNormNorm, uLightPos[i] - viewPos));
 		reflectBoi = normalize(reflect(viewPos - uLightPos[i], vNormNorm));
-		spec += specCalc(view, reflectBoi);
+		specularTotal += specCalc(view, reflectBoi);
 	}
-	vec4 sampleDiffuseTex = texture(uTex_dm, vTexCoord);
-	vec4 sampleSpecTex = texture(uTex_sm, vTexCoord);
-	diffuseTotal = diffuse * sampleDiffuseTex;
-	specularTotal = spec * sampleSpecTex;
-	rtFragColor = specularTotal + diffuseTotal;
+	diffuseMap = texture(uTex_dm, vTexCoord.xy);
+	specularMap = texture(uTex_sm, vTexCoord.xy);
+	rtFragColor = (specularTotal * specularMap) + (diffuseTotal * diffuseMap);
 	
 	// Assigning each display target variable
-	diffuseMap = diffuse;
-	specularMap = spec;
 	viewPosMap = viewPos;
+	coordinateMap = vTexCoord;
 	normalMap = vNorm;
-	coordinateMap = vec4(vTexCoord,0.0,1.0);
-	/*sampleTex = sampleDiffuseTex;*/
+	coordinateMap = vTexCoord;
 	
 	// DEBUGGING:
 	//rtFragColor = diffuse;
