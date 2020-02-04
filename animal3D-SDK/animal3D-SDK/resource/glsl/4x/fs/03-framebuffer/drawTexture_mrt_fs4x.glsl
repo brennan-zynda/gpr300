@@ -31,7 +31,7 @@
 //	4) assign sample to output render target (location 0)
 //	5) declare new render target (location 3) and output texcoord
 
-layout (location = 3) in vec2 vTexCoord;
+layout (location = 2) in vec4 vTexCoord;
 uniform sampler2D uTex_dm;
 
 //out vec4 rtFragColor;
@@ -45,9 +45,9 @@ void main()
 	//rtFragColor = vec4(1.0, 1.0, 1.0, 1.0);
 	
 	// Lab 2 Texturing Shader
-	vec4 sample_dm = texture(uTex_dm, vTexCoord);
+	vec4 sample_dm = texture(uTex_dm, vTexCoord.xy);
 	rtFragColor = sample_dm;
 	
 	// Lab 3 Stuff
-	rtTexcoord = vec4(vTexCoord, 0.0, 1.0);
+	rtTexcoord = vTexCoord;
 }

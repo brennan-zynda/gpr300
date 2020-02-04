@@ -39,7 +39,7 @@ layout (location = 8) in vec4 aCoord;
 uniform mat4 uMVP;
 uniform mat4 uAtlas;
 
-layout (location = 3) out vec2 vTexCoord;
+layout (location = 0) out vec2 vTexCoord;
 
 void main()
 {

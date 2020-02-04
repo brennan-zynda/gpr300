@@ -47,9 +47,9 @@ uniform mat4 uP;
 uniform mat4 uMV_nrm;
 uniform mat4 uAtlas;
 
-out vec4 viewPos;
-out vec4 vNorm;
-layout (location = 3) out vec2 vTexCoord;
+layout (location = 0) out vec4 viewPos;
+layout (location = 1) out vec4 vNorm;
+layout (location = 2) out vec4 vTexCoord;
 
 void main()
 {
@@ -63,5 +63,5 @@ void main()
 	vNorm = uMV_nrm * aNorm;
 	
 	// Updates the texture coordinate based upon the Atlas matrix
-	vTexCoord = (uAtlas * aCoord).xy;
+	vTexCoord = uAtlas * aCoord;
 }
