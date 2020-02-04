@@ -34,9 +34,9 @@
 out vec4 rtFragColor;
 uniform sampler2D uTex_dm;
 uniform double uTime;
-layout (location = 3) in vec4 texCoord;
+layout (location = 0) in vec4 texCoord;
 
 void main()
 {
-	rtFragColor = texture(uTex_dm, texCoord.xy) * abs(sin(float(uTime)));
+	rtFragColor = vec4(texture(uTex_dm, texCoord.xy).xyz,1.0) * abs(sin(float(uTime)));
 }
