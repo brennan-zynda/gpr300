@@ -82,14 +82,14 @@ void main()
 		reflectBoi = normalize(reflect(viewPos - uLightPos[i], vNormNorm));
 		specularTotal += specCalc(view, reflectBoi);
 	}
-	diffuseMap = texture(uTex_dm, vTexCoord.xy);
-	specularMap = texture(uTex_sm, vTexCoord.xy);
-	rtFragColor = (specularTotal * specularMap) + (diffuseTotal * diffuseMap);
 	
 	// Assigning each display target variable
 	viewPosMap = viewPos;
 	coordinateMap = vTexCoord;
 	normalMap = vNorm;
+	diffuseMap = texture(uTex_dm, vTexCoord.xy);
+	specularMap = texture(uTex_sm, vTexCoord.xy);
+	rtFragColor = (specularTotal * specularMap) + (diffuseTotal * diffuseMap);
 	
 	// DEBUGGING:
 	//rtFragColor = diffuse;
