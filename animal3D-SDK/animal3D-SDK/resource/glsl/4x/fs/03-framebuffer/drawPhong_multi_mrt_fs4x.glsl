@@ -40,6 +40,8 @@ layout (location = 5) out vec4 specularMap;
 layout (location = 1) out vec4 viewPosMap;
 layout (location = 2) out vec4 normalMap;
 layout (location = 3) out vec4 coordinateMap;
+layout (location = 6) out vec4 diffuseTotal;
+layout (location = 7) out vec4 specularTotal;
 
 uniform sampler2D uTex_dm;
 uniform sampler2D uTex_sm;
@@ -82,14 +84,16 @@ void main()
 	}
 	vec4 sampleDiffuseTex = texture(uTex_dm, vTexCoord);
 	vec4 sampleSpecTex = texture(uTex_sm, vTexCoord);
-	rtFragColor = (spec * sampleSpecTex) + (diffuse * sampleDiffuseTex);
+	diffuseTotal = diffuse * sampleDiffuseTex;
+	specularTotal = spec * sampleSpecTex;
+	rtFragColor = specularTotal + diffuseTotal;
 	
 	// Assigning each display target variable
 	diffuseMap = diffuse;
 	specularMap = spec;
 	viewPosMap = viewPos;
 	normalMap = vNorm;
-	//coordinateMap = vTexCoord;
+	coordinateMap = vec4(vTexCoord,0.0,1.0);
 	/*sampleTex = sampleDiffuseTex;*/
 	
 	// DEBUGGING:

@@ -31,7 +31,7 @@
 //	4) assign sample to output render target (location 0)
 //	5) declare new render target (location 3) and output texcoord
 
-in vec2 vTexCoord;
+layout (location = 3) in vec2 vTexCoord;
 uniform sampler2D uTex_dm;
 
 //out vec4 rtFragColor;

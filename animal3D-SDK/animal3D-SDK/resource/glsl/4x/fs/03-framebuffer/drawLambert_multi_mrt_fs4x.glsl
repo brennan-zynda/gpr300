@@ -38,6 +38,7 @@ layout (location = 4) out vec4 diffuseMap;
 layout (location = 1) out vec4 viewPosMap;
 layout (location = 2) out vec4 normalMap;
 layout (location = 3) out vec4 coordinateMap;
+layout (location = 6) out vec4 diffuseTotal;
 
 uniform sampler2D uTex_dm;
 uniform vec4 uLightPos[4];
@@ -65,6 +66,7 @@ void main()
 		diffuseMap += (uLightCol[i] * lambertCalc(vNorm, vCoord - uLightPos[i]));
 	}
 	rtFragColor = diffuseMap * texture(uTex_dm, vCoord.xy);
+	diffuseTotal = rtFragColor;
 	
 	// DEBUGGING:
 	//rtFragColor = diffuse;
