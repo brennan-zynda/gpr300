@@ -78,7 +78,7 @@ void main()
 	vec4 vNormNorm = normalize(vNorm);
 	for(int i = 0; i < uLightCt; i++)
 	{
-		diffuseTotal += (uLightCol[i] * lambertCalc(vNormNorm, uLightPos[i] - viewPos));
+		diffuseTotal += (uLightCol[i] * lambertCalc(vNormNorm, normalize(uLightPos[i] - viewPos)));
 		reflectBoi = normalize(reflect(viewPos - uLightPos[i], vNormNorm));
 		specularTotal += specCalc(view, reflectBoi);
 	}
@@ -90,7 +90,6 @@ void main()
 	viewPosMap = viewPos;
 	coordinateMap = vTexCoord;
 	normalMap = vNorm;
-	coordinateMap = vTexCoord;
 	
 	// DEBUGGING:
 	//rtFragColor = diffuse;

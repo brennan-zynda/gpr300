@@ -51,9 +51,7 @@ layout (location = 2) in vec4 vCoord;
 
 float lambertCalc(vec4 N, vec4 L)
 {
-	vec4 normN = normalize(N);
-	vec4 normL = normalize(L);
-	float dotNL = dot(normN, normL);
+	float dotNL = dot(N, L);
 	return max(0.0, dotNL);
 }
 
@@ -61,9 +59,10 @@ void main()
 {
 	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
 	diffuseTotal = vec4(0.0);
+	vec4 vNormNorm = normalize(vNorm);
 	for(int i = 0; i < uLightCt; i++)
 	{
-		diffuseTotal += (uLightCol[i] * lambertCalc(vNorm, vCoord - uLightPos[i]));
+		diffuseTotal += (uLightCol[i] * lambertCalc(vNormNorm, normalize(vCoord - uLightPos[i])));
 	}
 	diffuseMap = texture(uTex_dm, vCoord.xy);
 	rtFragColor = diffuseTotal * diffuseMap;
