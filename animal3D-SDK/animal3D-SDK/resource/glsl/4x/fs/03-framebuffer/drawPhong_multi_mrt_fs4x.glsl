@@ -94,7 +94,8 @@ void main()
 	// Assigning each display target variable
 	viewPosMap = viewPos;
 	coordinateMap = vTexCoord;
-	normalMap = vNorm;
+	normalMap = vec4(vNorm.xyz,1.0);
+	specularTotal = vec4(specularTotal.xyz,1.0);
 	diffuseMap = texture(uTex_dm, vTexCoord.xy);
 	specularMap = texture(uTex_sm, vTexCoord.xy);
 	rtFragColor = (specularTotal * specularMap) + (diffuseTotal * diffuseMap);

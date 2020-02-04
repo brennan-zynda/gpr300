@@ -77,7 +77,7 @@ void main()
 	diffuseMap = texture(uTex_dm, vCoord.xy);
 	rtFragColor = diffuseTotal * diffuseMap;
 	viewPosMap = viewPos;
-	normalMap = vNorm;
+	normalMap = vec4(vNorm.xyz,1.0);
 	coordinateMap = vCoord;
 	
 	// DEBUGGING:
