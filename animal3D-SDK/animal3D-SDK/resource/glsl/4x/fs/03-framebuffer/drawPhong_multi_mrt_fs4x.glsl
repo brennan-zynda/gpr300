@@ -33,7 +33,7 @@
 //	5) set location of final color render target (location 0)
 //	6) declare render targets for each attribute and shading component
 
-
+// All rendering targets (location values based on demo values)
 layout (location = 0) out vec4 rtFragColor;
 layout (location = 4) out vec4 diffuseMap;
 layout (location = 5) out vec4 specularMap;
@@ -43,22 +43,26 @@ layout (location = 3) out vec4 coordinateMap;
 layout (location = 6) out vec4 diffuseTotal;
 layout (location = 7) out vec4 specularTotal;
 
+// Inbound Uniforms
 uniform sampler2D uTex_dm;
 uniform sampler2D uTex_sm;
 uniform vec4 uLightPos[4];
 uniform vec4 uLightCol[4];
 uniform int uLightCt;
 
+// Inbound Varyings
 layout (location = 0) in vec4 viewPos;
 layout (location = 1) in vec4 vNorm;
 layout (location = 2) in vec4 vTexCoord;
 
+// Function to calculate lambertian product
 float lambertCalc(vec4 N, vec4 L)
 {
 	float dotNL = dot(N, L);
 	return max(0.0, dotNL);
 }
 
+// Function to calculate specular product
 float specCalc(vec4 view, vec4 reflectBoi)
 {
 	float spec = max(dot(view,reflectBoi), 0.0);
@@ -70,12 +74,16 @@ float specCalc(vec4 view, vec4 reflectBoi)
 
 void main()
 {
-	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
+	// Defaulting values
 	diffuseTotal = vec4(0.0);
 	vec4 reflectBoi = vec4(0.0);
 	specularTotal = vec4(0.0);
+	
+	// Normalizing values for future calculations
 	vec4 view = normalize(viewPos - vTexCoord);
 	vec4 vNormNorm = normalize(vNorm);
+	
+	// Calculating totals with each light
 	for(int i = 0; i < uLightCt; i++)
 	{
 		diffuseTotal += (uLightCol[i] * lambertCalc(vNormNorm, normalize(uLightPos[i] - viewPos)));

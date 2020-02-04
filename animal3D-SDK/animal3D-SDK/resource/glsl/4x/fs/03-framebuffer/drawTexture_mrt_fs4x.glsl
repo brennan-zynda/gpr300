@@ -31,9 +31,13 @@
 //	4) assign sample to output render target (location 0)
 //	5) declare new render target (location 3) and output texcoord
 
+// Inbound Varyings
 layout (location = 0) in vec4 vTexCoord;
+
+// Inbound Uniforms
 uniform sampler2D uTex_dm;
 
+// All rendering targets (location values based on demo values)
 layout (location = 0) out vec4 rtFragColor;
 layout (location = 3) out vec4 rtTexcoord;
 
