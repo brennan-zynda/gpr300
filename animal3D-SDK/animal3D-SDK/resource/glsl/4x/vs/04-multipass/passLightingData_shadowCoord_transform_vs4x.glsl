@@ -18,23 +18,24 @@
 	animal3D SDK: Minimal 3D Animation Framework
 	By Daniel S. Buckstein
 	
-	drawTexture_colorManip_fs4x.glsl
-	Draw texture sample and manipulate result.
+	passLightingData_shadowCoord_transform_vs4x.glsl
+	Vertex shader that prepares and passes lighting data. Outputs transformed 
+		position attribute and all others required for lighting. Also computes 
+		and passes shadow coordinate.
 */
 
 #version 410
 
 // ****TO-DO: 
-//	1) declare uniform variable for texture; see demo code for hints
-//	2) declare inbound varying for texture coordinate
-//	3) sample texture using texture coordinate
-//	4) modify sample in some creative way
-//	5) assign modified sample to output color
+//	0) copy previous lighting data vertex shader
+//	1) declare MVPB matrix for light
+//	2) declare varying for shadow coordinate
+//	3) calculate and pass shadow coordinate
 
-out vec4 rtFragColor;
+layout (location = 0) in vec4 aPosition;
 
 void main()
 {
-	// DUMMY OUTPUT: all fragments are OPAQUE LIGHT GREY
-	rtFragColor = vec4(0.5, 0.5, 0.5, 1.0);
+	// DUMMY OUTPUT: directly assign input position to output position
+	gl_Position = aPosition;
 }

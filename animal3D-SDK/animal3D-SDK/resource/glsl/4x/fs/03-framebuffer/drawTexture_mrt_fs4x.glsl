@@ -31,25 +31,10 @@
 //	4) assign sample to output render target (location 0)
 //	5) declare new render target (location 3) and output texcoord
 
-// Inbound Varyings
-layout (location = 0) in vec4 vTexCoord;
-
-// Inbound Uniforms
-uniform sampler2D uTex_dm;
-
-// All rendering targets (location values based on demo values)
-layout (location = 0) out vec4 rtFragColor;
-layout (location = 3) out vec4 rtTexcoord;
+out vec4 rtFragColor;
 
 void main()
 {
 	// DUMMY OUTPUT: all fragments are OPAQUE WHITE
-	//rtFragColor = vec4(1.0, 1.0, 1.0, 1.0);
-	
-	// Lab 2 Texturing Shader
-	vec4 sample_dm = texture(uTex_dm, vTexCoord.xy);
-	rtFragColor = sample_dm;
-	
-	// Lab 3 Stuff
-	rtTexcoord = vTexCoord;
+	rtFragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

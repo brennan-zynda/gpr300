@@ -18,23 +18,20 @@
 	animal3D SDK: Minimal 3D Animation Framework
 	By Daniel S. Buckstein
 	
-	drawTexture_colorManip_fs4x.glsl
-	Draw texture sample and manipulate result.
+	drawTexture_outline_fs4x.glsl
+	Draw texture sample with outlines.
 */
 
 #version 410
 
 // ****TO-DO: 
-//	1) declare uniform variable for texture; see demo code for hints
-//	2) declare inbound varying for texture coordinate
-//	3) sample texture using texture coordinate
-//	4) modify sample in some creative way
-//	5) assign modified sample to output color
+//	0) copy existing texturing shader
+//	1) implement outline algorithm - see render code for uniform hints
 
 out vec4 rtFragColor;
 
 void main()
 {
-	// DUMMY OUTPUT: all fragments are OPAQUE LIGHT GREY
-	rtFragColor = vec4(0.5, 0.5, 0.5, 1.0);
+	// DUMMY OUTPUT: all fragments are OPAQUE DARK GREY
+	rtFragColor = vec4(0.2, 0.2, 0.2, 1.0);
 }
