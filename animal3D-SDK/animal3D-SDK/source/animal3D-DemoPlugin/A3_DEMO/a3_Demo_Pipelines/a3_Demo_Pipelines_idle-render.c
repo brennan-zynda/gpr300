@@ -580,7 +580,7 @@ void a3pipelines_render(a3_DemoState const* demoState, a3_Demo_Pipelines const* 
 	// also draw other viewer/viewer-like object in scene
 	if (demoState->displayWorldAxes && demoMode->pass != pipelines_passShadow)
 	{
-		a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->uMVP, 1, viewProjectionMat.mm);
+		//a3shaderUniformSendFloatMat(a3unif_mat4, 0, currentDemoProgram->/*uMVP*/, 1, viewProjectionMat.mm);
 		a3vertexDrawableRenderActive();
 	}
 
