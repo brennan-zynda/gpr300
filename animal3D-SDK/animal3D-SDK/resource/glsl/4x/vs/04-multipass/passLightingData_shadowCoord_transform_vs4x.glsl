@@ -40,7 +40,7 @@ uniform mat4 uMV;
 uniform mat4 uP;
 uniform mat4 uMV_nrm;
 uniform mat4 uAtlas;
-uniform mat4 uMVPB;
+uniform mat4 uMVPB_other;
 
 layout (location = 0) out vec4 viewPos;
 layout (location = 1) out vec4 vNorm;
@@ -62,6 +62,6 @@ void main()
 	vTexCoord = uAtlas * aCoord;
 	
 	// Shadow Calculations
-	shadowCoord = uMVPB * aPosition;
+	shadowCoord = uMVPB_other * aPosition;
 }
 
