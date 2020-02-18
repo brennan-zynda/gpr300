@@ -18,26 +18,24 @@
 	animal3D SDK: Minimal 3D Animation Framework
 	By Daniel S. Buckstein
 	
-	a3_DemoRenderUtils.c
-	Drawing utilities implementations.
+	drawTexture_blurGaussian_fs4x.glsl
+	Draw texture with Gaussian blurring.
 */
 
-#include "a3_DemoRenderUtils.h"
+#version 410
 
+// ****TO-DO: 
+//	0) copy existing texturing shader
+//	1) declare uniforms for pixel size and sampling axis
+//	2) implement Gaussian blur function using a 1D kernel (hint: Pascal's triangle)
+//	3) sample texture using Gaussian blur function and output result
 
-//-----------------------------------------------------------------------------
+uniform sampler2D uImage00;
 
-// OpenGL
-#ifdef _WIN32
-#include <Windows.h>
-#include <GL/GL.h>
-#else	// !_WIN32
-#include <OpenGL/gl3.h>
-#endif	// _WIN32
+layout (location = 0) out vec4 rtFragColor;
 
-
-//-----------------------------------------------------------------------------
-
-
-
-//-----------------------------------------------------------------------------
+void main()
+{
+	// DUMMY OUTPUT: all fragments are OPAQUE MAGENTA
+	rtFragColor = vec4(1.0, 0.0, 1.0, 1.0);
+}

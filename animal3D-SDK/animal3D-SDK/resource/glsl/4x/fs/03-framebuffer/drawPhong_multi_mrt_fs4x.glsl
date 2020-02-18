@@ -33,78 +33,10 @@
 //	5) set location of final color render target (location 0)
 //	6) declare render targets for each attribute and shading component
 
-// All rendering targets (location values based on demo values)
-layout (location = 0) out vec4 rtFragColor;
-layout (location = 4) out vec4 diffuseMap;
-layout (location = 5) out vec4 specularMap;
-layout (location = 1) out vec4 viewPosMap;
-layout (location = 2) out vec4 normalMap;
-layout (location = 3) out vec4 coordinateMap;
-layout (location = 6) out vec4 diffuseTotal;
-layout (location = 7) out vec4 specularTotal;
-
-// Inbound Uniforms
-uniform sampler2D uTex_dm;
-uniform sampler2D uTex_sm;
-uniform vec4 uLightPos[4];
-uniform vec4 uLightCol[4];
-uniform int uLightCt;
-
-// Inbound Varyings
-layout (location = 0) in vec4 viewPos;
-layout (location = 1) in vec4 vNorm;
-layout (location = 2) in vec4 vTexCoord;
-
-// Function to calculate lambertian product
-float lambertCalc(vec4 N, vec4 L)
-{
-	float dotNL = dot(N, L);
-	return max(0.0, dotNL);
-}
-
-// Function to calculate specular product
-float specCalc(vec4 view, vec4 reflectBoi)
-{
-	float spec = max(dot(view,reflectBoi), 0.0);
-	spec *= spec; // ^2
-	spec *= spec; // ^4
-	spec *= spec; // ^8
-	return spec;	
-}
+out vec4 rtFragColor;
 
 void main()
 {
-	// Defaulting values
-	diffuseTotal = vec4(0.0);
-	vec4 reflectBoi = vec4(0.0);
-	specularTotal = vec4(0.0);
-	
-	// Normalizing values for future calculations
-	vec4 view = normalize(viewPos - vTexCoord);
-	vec4 vNormNorm = normalize(vNorm);
-	
-	// Calculating totals with each light
-	for(int i = 0; i < uLightCt; i++)
-	{
-		diffuseTotal += (uLightCol[i] * lambertCalc(vNormNorm, normalize(uLightPos[i] - viewPos)));
-		reflectBoi = normalize(reflect(viewPos - uLightPos[i], vNormNorm));
-		specularTotal += specCalc(view, reflectBoi);
-	}
-	
-	// Assigning each display target variable
-	viewPosMap = viewPos;
-	coordinateMap = vTexCoord;
-	normalMap = vec4(vNorm.xyz,1.0);
-	specularTotal = vec4(specularTotal.xyz,1.0);
-	diffuseMap = texture(uTex_dm, vTexCoord.xy);
-	specularMap = texture(uTex_sm, vTexCoord.xy);
-	rtFragColor = (specularTotal * specularMap) + (diffuseTotal * diffuseMap);
-	
-	// DEBUGGING:
-	//rtFragColor = diffuse;
-	//rtFragColor = uLightPos[1];
-	//rtFragColor = uLightCol[1];
-	//rtFragColor = vCoord;
-	//rtFragColor = vNorm;
-	//rtFragColor = viewPos;
+	// DUMMY OUTPUT: all fragments are OPAQUE GREEN
+	rtFragColor = vec4(0.0, 1.0, 0.0, 1.0);
 }
