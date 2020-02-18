@@ -33,6 +33,10 @@
 layout (location = 1) out vec4 rtViewPosition;
 layout (location = 2) out vec4 rtViewNormal;
 layout (location = 3) out vec4 rtAtlasTexcoord;
+layout (location = 4) out vec4 rtDiffuseSample;
+layout (location = 5) out vec4 rtSpecularSample;
+layout (location = 6) out vec4 rtDiffuseTotal;
+layout (location = 7) out vec4 rtSpecularTotal;
 
 void main()
 {
