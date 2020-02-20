@@ -33,14 +33,30 @@ uniform sampler2D uImage00;
 
 layout (location = 0) out vec4 rtFragColor;
 
+layout (location = 0) in vec4 vTexCoord;
+
 // (1)
 float relativeLuminance(vec3 c)
 {
 	return (0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b);
 }
 
+vec3 lumaToneMap(vec3 color)
+{
+	float white = 2.0;
+	float gamma = 2.2;
+	float luma = relativeLuminance(color);
+	float toneMap = luma * (1.0 + luma / (white*white)) / (1.0 + luma);
+	color *= toneMap/luma;
+	color = pow(color, vec3(1.0 / gamma));
+	return color;
+}
+
 void main()
 {
-	// DUMMY OUTPUT: all fragments are OPAQUE CYAN
-	rtFragColor = vec4(0.0, 1.0, 1.0, 1.0);
+	vec4 tex = texture(uImage00, vTexCoord.xy);
+	rtFragColor = vec4(lumaToneMap(tex.rgb),1) * tex;
+	
+	// DEBUGGING:
+	//rtFragColor = vtCoord;
 }
