@@ -573,10 +573,72 @@ void a3pipelines_render(a3_DemoState const* demoState, a3_Demo_Pipelines const* 
 
 	// ****TO-DO: 
 	//	-> 4.1f: repeat bright pass and blur passes on smaller FBOs
-	/*
-	????????? see above
-	*/
+	// bright-pass quarter-size
+	currentDemoProgram = demoState->prog_drawTexture_brightPass;
+	a3shaderProgramActivate(currentDemoProgram->program);
 
+	currentPass = pipelines_passBright_4;
+	currentWriteFBO = writeFBO[currentPass];
+	currentReadFBO = readFBO[currentPass][0];
+	a3framebufferActivate(currentWriteFBO);
+	a3framebufferBindColorTexture(currentReadFBO, a3tex_unit00, 0);
+	a3vertexDrawableRenderActive();
+
+	// blur quarter-size
+	currentDemoProgram = demoState->prog_drawTexture_blurGaussian;
+	a3shaderProgramActivate(currentDemoProgram->program);
+	a3real2Set(pixelSize.v, a3recip((a3real)currentWriteFBO->frameWidth), a3recip((a3real)currentWriteFBO->frameHeight));
+	a3shaderUniformSendFloat(a3unif_vec2, currentDemoProgram->uSize, 1, pixelSize.v);
+
+	currentPass = pipelines_passBlurH_4;
+	currentWriteFBO = writeFBO[currentPass];
+	currentReadFBO = readFBO[currentPass][0];
+	a3framebufferActivate(currentWriteFBO);
+	a3framebufferBindColorTexture(currentReadFBO, a3tex_unit00, 0);
+	a3shaderUniformSendFloat(a3unif_vec2, currentDemoProgram->uAxis, 1, sampleAxisH.v);
+	a3vertexDrawableRenderActive();
+
+	currentPass = pipelines_passBlurV_4;
+	currentWriteFBO = writeFBO[currentPass];
+	currentReadFBO = readFBO[currentPass][0];
+	a3framebufferActivate(currentWriteFBO);
+	a3framebufferBindColorTexture(currentReadFBO, a3tex_unit00, 0);
+	a3shaderUniformSendFloat(a3unif_vec2, currentDemoProgram->uAxis, 1, sampleAxisV.v);
+	a3vertexDrawableRenderActive();
+
+	// bright-pass eighth-size
+	currentDemoProgram = demoState->prog_drawTexture_brightPass;
+	a3shaderProgramActivate(currentDemoProgram->program);
+
+	currentPass = pipelines_passBright_8;
+	currentWriteFBO = writeFBO[currentPass];
+	currentReadFBO = readFBO[currentPass][0];
+	a3framebufferActivate(currentWriteFBO);
+	a3framebufferBindColorTexture(currentReadFBO, a3tex_unit00, 0);
+	a3vertexDrawableRenderActive();
+
+	// blur eighth-size
+	/*currentDemoProgram = demoState->prog_drawTexture_blurGaussian;
+	a3shaderProgramActivate(currentDemoProgram->program);
+	a3real2Set(pixelSize.v, a3recip((a3real)currentWriteFBO->frameWidth), a3recip((a3real)currentWriteFBO->frameHeight));
+	a3shaderUniformSendFloat(a3unif_vec2, currentDemoProgram->uSize, 1, pixelSize.v);
+
+	currentPass = pipelines_passBlurH_8;
+	currentWriteFBO = writeFBO[currentPass];
+	currentReadFBO = readFBO[currentPass][0];
+	a3framebufferActivate(currentWriteFBO);
+	a3framebufferBindColorTexture(currentReadFBO, a3tex_unit00, 0);
+	a3shaderUniformSendFloat(a3unif_vec2, currentDemoProgram->uAxis, 1, sampleAxisH.v);
+	a3vertexDrawableRenderActive();
+
+	currentPass = pipelines_passBlurV_8;
+	currentWriteFBO = writeFBO[currentPass];
+	currentReadFBO = readFBO[currentPass][0];
+	a3framebufferActivate(currentWriteFBO);
+	a3framebufferBindColorTexture(currentReadFBO, a3tex_unit00, 0);
+	a3shaderUniformSendFloat(a3unif_vec2, currentDemoProgram->uAxis, 1, sampleAxisV.v);
+	a3vertexDrawableRenderActive();
+	*/
 
 	// bloom composite
 	currentDemoProgram = demoState->prog_drawTexture_blendScreen4;
