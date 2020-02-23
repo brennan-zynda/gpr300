@@ -37,8 +37,14 @@
 //				inverse projection-bias matrix and the depth map
 //			-> normal calculated by expanding range of normal sample
 //			-> surface texture coordinate is used as-is once sampled
-
+uniform sampler2D uImage00;
 in vec4 vTexcoord;
+in vbLightingData {
+	vec4 vViewPosition;
+	vec4 vViewNormal;
+	vec4 vTexcoord;
+	vec4 vBiasedClipCoord;
+};
 
 layout (location = 0) out vec4 rtFragColor;
 layout (location = 4) out vec4 rtDiffuseMapSample;
@@ -46,12 +52,41 @@ layout (location = 5) out vec4 rtSpecularMapSample;
 layout (location = 6) out vec4 rtDiffuseLightTotal;
 layout (location = 7) out vec4 rtSpecularLightTotal;
 
+float lambertCalc(vec4 N, vec4 L)
+{
+	float dotNL = dot(N, L);
+	return max(0.0, dotNL);
+}
+
+float specCalc(vec4 view, vec4 reflectBoi)
+{
+	float spec = pow(max(dot(view,reflectBoi), 0.0),32);
+	return spec;	
+}
+
 void main()
 {
-	// DUMMY OUTPUT: all fragments are OPAQUE CYAN (and others)
-	rtFragColor = vec4(0.0, 1.0, 1.0, 1.0);
-	rtDiffuseMapSample = vec4(0.0, 0.0, 1.0, 1.0);
-	rtSpecularMapSample = vec4(0.0, 1.0, 0.0, 1.0);
-	rtDiffuseLightTotal = vec4(1.0, 0.0, 1.0, 1.0);
-	rtSpecularLightTotal = vec4(1.0, 1.0, 0.0, 1.0);
+	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
+	vec4 diffuse = vec4(0.0);
+	vec4 reflectBoi = vec4(0.0);
+	vec4 spec = vec4(0.0);
+	vec4 view = normalize(vViewPosition);
+	vec4 vNormNorm = normalize(vViewNormal);
+	for(int i = 0; i < uLightCt; i++)
+	{
+		diffuse += (uLightCol[i] * lambertCalc(vNormNorm, normalize(uLightPos[i] - vViewPosition)));
+		reflectBoi = normalize(reflect(vViewPosition - uLightPos[i], vViewNormal));
+		spec += specCalc(view, reflectBoi);
+	}
+	
+	rtFragColor = (spec * texture(uTex_sm, vTexcoord.xy)) + (diffuse * texture(uTex_dm, vTexcoord.xy));
+	
+	// DEBUGGING:
+	//rtFragColor = diffuse;
+	//rtFragColor = spec;
+	//rtFragColor = uLightPos[1];
+	//rtFragColor = uLightCol[1];
+	//rtFragColor = vTexcoord;
+	//rtFragColor = vViewNormal;
+	//rtFragColor = vViewPosition;
 }
