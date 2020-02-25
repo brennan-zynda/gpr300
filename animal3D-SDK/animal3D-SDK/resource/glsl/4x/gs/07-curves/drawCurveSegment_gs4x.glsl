@@ -43,6 +43,8 @@
 //	6) write interpolation functions to help with sampling
 //	7) select curve type and sample over [0, 1] interval
 
+uniform vec4 uMVP;
+
 void main()
 {
 	

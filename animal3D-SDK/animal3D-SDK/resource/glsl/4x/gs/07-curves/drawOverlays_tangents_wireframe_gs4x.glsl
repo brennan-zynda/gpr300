@@ -39,9 +39,42 @@
 //	4) declare output layout specifications
 //	5) declare outbound color
 //	6) draw tangent bases
-//	7) draw wireframe
+//	7) draw wireframe (SHIFT+F)
+
+// (1)
+layout (triangles) in; // triangles, lines, points, lines adjacency, or triangles adjacency
+
+// (2)
+in vbVertexData {
+	mat4 vTangentBasis_view;
+	vec4 vTexcoord_atlas;
+	flat int vVertexID, vInstanceID, vModelID;
+} vVertexData[]; // Size 3 due to triangle input (can't define size), order goes (corresponding to above) 3,2,1,4,6
+
+// (4)
+layout (line_strip, max_vertices = MAX_VERTICES) out; // triangle strip, line strip
+
+// (5)
+out vec4 vColor;
+
+// (7)
+void drawWireframe()
+{
+	// Color is orange
+	vColor = vec4(1.0,0.5,0.0,1.0);
+	// Gets 4 vertices
+	gl_Position = gl_in[0].gl_Position;
+	EmitVertex();
+	gl_Position = gl_in[1].gl_Position;
+	EmitVertex();
+	gl_Position = gl_in[2].gl_Position;
+	EmitVertex();
+	gl_Position = gl_in[0].gl_Position;
+	EmitVertex();
+	EndPrimitive();
+}
 
 void main()
 {
-	
+	drawWireframe();
 }
