@@ -34,13 +34,27 @@
 
 
 //-----------------------------------------------------------------------------
+
+void a3demo_initScene(a3_DemoState* demoState);
+void a3demo_initSceneRefresh(a3_DemoState* demoState);
+
+
+//-----------------------------------------------------------------------------
+
+void a3shading_init(a3_DemoState const* demoState, a3_Demo_Shading* demoMode);
+void a3pipelines_init(a3_DemoState const* demoState, a3_Demo_Pipelines* demoMode);
+void a3curves_init(a3_DemoState const* demoState, a3_Demo_Curves* demoMode);
+
+
+//-----------------------------------------------------------------------------
 // INITIALIZE
 
 // initialize non-asset objects
 void a3demo_initScene(a3_DemoState *demoState)
 {
 	a3ui32 i;
-	a3_DemoCamera *camera;
+	a3_DemoProjector* projector;
+	a3_DemoPointLight* pointLight;
 
 	// camera's starting orientation depends on "vertical" axis
 	// we want the exact same view in either case
@@ -68,22 +82,32 @@ void a3demo_initScene(a3_DemoState *demoState)
 		a3demo_initSceneObject(demoState->cameraObject + i);
 
 	// cameras
-	a3demo_initCamera(demoState->sceneCamera);
-
-	// camera params
-	demoState->activeCamera = 0;
+	a3demo_initProjector(demoState->sceneCamera);
+	a3demo_initProjector(demoState->shadowLight);
 
 	// scene cameras
-	camera = demoState->sceneCamera + 0;
-	camera->perspective = a3true;
-	camera->fovy = a3real_fortyfive;
-	camera->znear = 1.0f;
-	camera->zfar = 1000.0f;
-	camera->ctrlMoveSpeed = 10.0f;
-	camera->ctrlRotateSpeed = 5.0f;
-	camera->ctrlZoomSpeed = 5.0f;
-	camera->sceneObject->position = sceneCameraStartPos;
-	camera->sceneObject->euler = sceneCameraStartEuler;
+	projector = demoState->sceneCamera + 0;
+	projector->perspective = a3true;
+	projector->fovy = a3real_fortyfive;
+	projector->znear = 1.0f;
+	projector->zfar = 1000.0f;
+	projector->ctrlMoveSpeed = 10.0f;
+	projector->ctrlRotateSpeed = 5.0f;
+	projector->ctrlZoomSpeed = 5.0f;
+	projector->sceneObject->position = sceneCameraStartPos;
+	projector->sceneObject->euler = sceneCameraStartEuler;
+
+	// additional cameras
+	projector = demoState->shadowLight + 0;
+	projector->perspective = a3true;
+	projector->fovy = a3real_ninety;
+	projector->znear = 10.0f;
+	projector->zfar = 100.0f;
+	projector->ctrlMoveSpeed = 10.0f;
+	projector->ctrlRotateSpeed = 5.0f;
+	projector->ctrlZoomSpeed = 5.0f;
+	projector->sceneObject->position = sceneCameraStartPos;
+	projector->sceneObject->euler = sceneCameraStartEuler;
 
 
 	// init transforms
@@ -97,28 +121,101 @@ void a3demo_initScene(a3_DemoState *demoState)
 	}
 
 
-	// demo modes
-	demoState->demoModeCount = 1;
-	demoState->demoMode = 0;
-
-	// demo mode A: deferred + bloom
-	//	 1) scene
-	//		a) color buffer
-	for (i = 0; i < demoStateMaxSubModes; ++i)
-		demoState->demoOutputCount[0][i] = 1;
-	demoState->demoSubModeCount[0] = demoStateMaxSubModes;
-	demoState->demoOutputCount[0][0] = demoStateMaxOutputModes;
-
-
 	// initialize other objects and settings
-	demoState->displayGrid = 1;
-	demoState->displayWorldAxes = 1;
-	demoState->displayObjectAxes = 1;
-	demoState->displaySkybox = 1;
-	demoState->displayHiddenVolumes = 1;
-	demoState->displayPipeline = 0;
-	demoState->updateAnimation = 1;
-	demoState->displayTangentBases = 0;
+	demoState->displayGrid = a3true;
+	demoState->displayWorldAxes = a3true;
+	demoState->displayObjectAxes = a3true;
+	demoState->displayTangentBases = a3false;
+	demoState->displayWireframe = a3false;
+	demoState->displaySkybox = a3true;
+	demoState->displayHiddenVolumes = a3true;
+	demoState->displayPipeline = a3false;
+	demoState->updateAnimation = a3true;
+	demoState->stencilTest = a3false;
+	demoState->skipIntermediatePasses = a3false;
+
+
+	// lights
+	demoState->forwardLightCount = demoStateMaxCount_lightObject;
+	demoState->deferredLightCount = demoStateMaxCount_lightVolumePerBlock / 32;
+
+	// first light position is hard-coded (starts at camera)
+	demoState->mainLightObject->position = demoState->mainCameraObject->position;
+	demoState->mainLightObject->euler = demoState->mainCameraObject->euler;
+	demoState->mainLightObject->scale = a3vec3_one;
+	pointLight = demoState->forwardPointLight;
+	pointLight->worldPos = a3vec4_w;
+	pointLight->worldPos.xyz = demoState->mainLightObject->position;
+	pointLight->radius = 100.0f;
+	pointLight->radiusInvSq = a3recip(pointLight->radius * pointLight->radius);
+	pointLight->color = a3vec4_one;
+
+	// all other lights are pseudo-random
+	a3randomSetSeed(2048);	// 0, 512, 2048, 8192, 65536
+	for (i = 1, pointLight = demoState->forwardPointLight + i;
+		i < demoStateMaxCount_lightObject;
+		++i, ++pointLight)
+	{
+		// set to zero vector
+		pointLight->worldPos = a3vec4_w;
+
+		// random positions
+		pointLight->worldPos.x = a3randomRange(-10.0f, +10.0f);
+		if (demoState->verticalAxis)
+		{
+			pointLight->worldPos.z = -a3randomRange(-10.0f, +10.0f);
+			pointLight->worldPos.y = -a3randomRange(-2.0f, +8.0f);
+		}
+		else
+		{
+			pointLight->worldPos.y = a3randomRange(-10.0f, +10.0f);
+			pointLight->worldPos.z = a3randomRange(-2.0f, +8.0f);
+		}
+
+		// random colors
+		pointLight->color.r = a3randomNormalized();
+		pointLight->color.g = a3randomNormalized();
+		pointLight->color.b = a3randomNormalized();
+		pointLight->color.a = a3real_one;
+
+		// random radius
+		pointLight->radius = a3randomRange(10.0f, 50.0f);
+		pointLight->radiusSq = pointLight->radius * pointLight->radius;
+		pointLight->radiusInvSq = a3recip(pointLight->radiusSq);
+		pointLight->radiusInv = a3recip(pointLight->radius);
+	}
+
+	// deferred lights
+	for (i = 0, pointLight = demoState->deferredPointLight + i;
+		i < demoStateMaxCount_lightVolume;
+		++i, ++pointLight)
+	{
+		// set to zero vector
+		pointLight->worldPos = a3vec4_w;
+
+		// random positions
+		pointLight->worldPos.x = a3randomRange(-6.0f, +6.0f);
+		if (demoState->verticalAxis)
+		{
+			pointLight->worldPos.z = -a3randomRange(-6.0f, +6.0f);
+			pointLight->worldPos.y = -a3randomRange(-2.0f, +4.0f);
+		}
+		else
+		{
+			pointLight->worldPos.y = a3randomRange(-6.0f, +6.0f);
+			pointLight->worldPos.z = a3randomRange(-2.0f, +4.0f);
+		}
+
+		// random colors
+		pointLight->color.r = a3randomNormalized();
+		pointLight->color.g = a3randomNormalized();
+		pointLight->color.b = a3randomNormalized();
+		pointLight->color.a = a3real_one;
+
+		// random radius: they should be small!
+		pointLight->radius = a3randomRange(0.25f, 0.50f);
+		pointLight->radiusInvSq = a3recip(pointLight->radius * pointLight->radius);
+	}
 
 
 	// position scene objects
@@ -150,12 +247,43 @@ void a3demo_initScene(a3_DemoState *demoState)
 		demoState->cylinderObject->position.y = +6.0f;
 		demoState->teapotObject->position.y = -6.0f;
 	}
+
+
+	// animation
+	demoState->segmentDuration = a3real_four;
+	demoState->segmentDurationInv = a3recip(demoState->segmentDuration);
+	demoState->segmentCount = 4;
+	a3real4SetReal3W(demoState->curveWaypoint[0].v, demoState->sphereObject->position.v, a3real_one);
+	a3real4SetReal3W(demoState->curveWaypoint[1].v, demoState->cylinderObject->position.v, a3real_one);
+	a3real4SetReal3W(demoState->curveWaypoint[2].v, demoState->torusObject->position.v, a3real_one);
+	a3real4SetReal3W(demoState->curveWaypoint[3].v, demoState->teapotObject->position.v, a3real_one);
+	for (i = 0; i < demoState->segmentCount; ++i)
+	{
+		// offset waypoints
+		demoState->curveWaypoint[i].z += a3real_two;
+		a3real3MulS(demoState->curveWaypoint[i].v, a3real_two);
+
+		// set the handle as a factor of the waypoint just for testing
+		demoState->curveHandle[i] = demoState->curveWaypoint[i];
+		a3real3ProductS(demoState->curveHandle[i].v, demoState->curveWaypoint[i].v, a3real_two);
+	}
+
+
+	// demo modes
+	a3shading_init(demoState, demoState->demoMode_shading);
+	a3pipelines_init(demoState, demoState->demoMode_pipelines);
+	a3curves_init(demoState, demoState->demoMode_curves);
+	demoState->demoMode = demoState_curves;
+
+	// active camera params
+	demoState->activeCamera = demoState->demoMode_pipelines->activeCamera;
 }
 
 // refresh non-asset scene objects (e.g. re-link pointers)
 void a3demo_initSceneRefresh(a3_DemoState *demoState)
 {
-	a3demo_setCameraSceneObject(demoState->sceneCamera, demoState->mainCameraObject);
+	a3demo_setProjectorSceneObject(demoState->sceneCamera, demoState->mainCameraObject);
+	a3demo_setProjectorSceneObject(demoState->shadowLight, demoState->mainLightObject);
 }
 
 

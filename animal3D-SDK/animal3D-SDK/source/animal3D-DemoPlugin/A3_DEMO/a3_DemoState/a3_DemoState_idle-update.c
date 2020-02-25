@@ -63,8 +63,8 @@ inline void a3demo_applyScale_internal(a3_DemoSceneObject *sceneObject, a3real4x
 //-----------------------------------------------------------------------------
 // UPDATE SUB-ROUTINES
 
-// update for main render pipeline
-void a3demo_update_main(a3_DemoState *demoState, a3f64 dt)
+// scene update
+void a3demo_update_scene(a3_DemoState *demoState, a3f64 dt)
 {
 	a3ui32 i;
 
@@ -106,9 +106,12 @@ void a3demo_update_main(a3_DemoState *demoState, a3f64 dt)
 	a3mat4 scaleMat = a3mat4_identity;
 
 	// active camera
-	a3_DemoCamera *camera = demoState->camera + demoState->activeCamera;
-	a3_DemoSceneObject *cameraObject = camera->sceneObject;
+	a3_DemoProjector *activeCamera = demoState->projector + demoState->activeCamera;
+	a3_DemoSceneObject *activeCameraObject = activeCamera->sceneObject;
 	a3_DemoSceneObject *currentSceneObject;
+
+	// light pointers
+	a3_DemoPointLight* pointLight;
 
 
 	// do simple animation
@@ -137,10 +140,12 @@ void a3demo_update_main(a3_DemoState *demoState, a3f64 dt)
 		a3demo_updateSceneObject(demoState->sceneObject + i, 0);
 	for (i = 0; i < demoStateMaxCount_cameraObject; ++i)
 		a3demo_updateSceneObject(demoState->cameraObject + i, 1);
+	for (i = 0; i < demoStateMaxCount_lightObject; ++i)
+		a3demo_updateSceneObject(demoState->lighObject + i, 1);
 
 	// update cameras/projectors
 	for (i = 0; i < demoStateMaxCount_projector; ++i)
-		a3demo_updateCameraViewProjection(demoState->camera + i);
+		a3demo_updateProjectorViewProjectionMat(demoState->projector + i);
 
 
 	// apply corrections if required
@@ -148,7 +153,7 @@ void a3demo_update_main(a3_DemoState *demoState, a3f64 dt)
 	demoState->gridTransform = useVerticalY ? convertZ2Y : a3mat4_identity;
 
 	// skybox position
-	demoState->skyboxObject->modelMat.v3 = camera->sceneObject->modelMat.v3;
+	demoState->skyboxObject->modelMat.v3 = activeCameraObject->modelMat.v3;
 
 
 	// grid lines highlight
@@ -159,6 +164,20 @@ void a3demo_update_main(a3_DemoState *demoState, a3f64 dt)
 		demoState->gridColor.g = 0.25f;
 	else
 		demoState->gridColor.b = 0.25f;
+
+
+	// update lights
+	pointLight = demoState->forwardPointLight;
+	pointLight->worldPos.xyz = demoState->mainLightObject->position;
+
+	// update lights view positions for current camera
+	for (i = 0, pointLight = demoState->forwardPointLight + i;
+		i < demoState->forwardLightCount;
+		++i, ++pointLight)
+	{
+		// convert to view space and retrieve view position
+		a3real4Real4x4Product(pointLight->viewPos.v, activeCameraObject->modelMatInv.m, pointLight->worldPos.v);
+	}
 
 
 	// correct rotations as needed
@@ -191,13 +210,24 @@ void a3demo_update_main(a3_DemoState *demoState, a3f64 dt)
 //-----------------------------------------------------------------------------
 // UPDATE
 
+void a3pipelines_update(a3_DemoState* demoState, a3_Demo_Pipelines* demoMode, a3f64 dt);
+void a3curves_update(a3_DemoState* demoState, a3_Demo_Curves* demoMode, a3f64 dt);
+
 void a3demo_update(a3_DemoState *demoState, a3f64 dt)
 {
+	// update scene
+	a3demo_update_scene(demoState, dt);
+
+	// update for specific mode
 	switch (demoState->demoMode)
 	{
-		// main render pipeline
-	case demoStateMode_main:
-		a3demo_update_main(demoState, dt);
+	case demoState_shading:
+		break;
+	case demoState_pipelines:
+		a3pipelines_update(demoState, demoState->demoMode_pipelines, dt);
+		break;
+	case demoState_curves:
+		a3curves_update(demoState, demoState->demoMode_curves, dt);
 		break;
 	}
 }
