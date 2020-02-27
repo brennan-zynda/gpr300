@@ -37,14 +37,27 @@
 //				inverse projection-bias matrix and the depth map
 //			-> normal calculated by expanding range of normal sample
 //			-> surface texture coordinate is used as-is once sampled
-uniform sampler2D uImage00;
-in vec4 vTexcoord;
+
+// G-Buffer Uniforms
+uniform sampler2D uImage00; // Depth
+uniform sampler2D uImage01; // Position
+uniform sampler2D uImage02; // Normal
+uniform sampler2D uImage03; // Texcoord
+uniform sampler2D uImage04; // Diffuse Map
+uniform sampler2D uImage05; // Specular Map
+
 in vbLightingData {
 	vec4 vViewPosition;
 	vec4 vViewNormal;
 	vec4 vTexcoord;
 	vec4 vBiasedClipCoord;
 };
+
+uniform mat4 uPB_inv;
+
+uniform vec4 uLightPos[4];
+uniform vec4 uLightCol[4];
+uniform int uLightCt;
 
 layout (location = 0) out vec4 rtFragColor;
 layout (location = 4) out vec4 rtDiffuseMapSample;
@@ -58,31 +71,62 @@ float lambertCalc(vec4 N, vec4 L)
 	return max(0.0, dotNL);
 }
 
+// Function to calculate specular product
 float specCalc(vec4 view, vec4 reflectBoi)
 {
-	float spec = pow(max(dot(view,reflectBoi), 0.0),32);
+	float spec = max(dot(view,reflectBoi), 0.0);
+	spec *= spec; // ^2
+	spec *= spec; // ^4
+	spec *= spec; // ^8
 	return spec;	
 }
 
 void main()
 {
-	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
-	vec4 diffuse = vec4(0.0);
+	// Defaulting values
+	rtDiffuseLightTotal = vec4(0.0);
 	vec4 reflectBoi = vec4(0.0);
-	vec4 spec = vec4(0.0);
-	vec4 view = normalize(vViewPosition);
+	rtSpecularLightTotal = vec4(0.0);
+	
+	// Normalizing values for future calculations
+	vec4 view = normalize(vViewPosition - vTexcoord);
 	vec4 vNormNorm = normalize(vViewNormal);
+	
+	// Calculating totals with each light
 	for(int i = 0; i < uLightCt; i++)
 	{
-		diffuse += (uLightCol[i] * lambertCalc(vNormNorm, normalize(uLightPos[i] - vViewPosition)));
-		reflectBoi = normalize(reflect(vViewPosition - uLightPos[i], vViewNormal));
-		spec += specCalc(view, reflectBoi);
+		rtDiffuseLightTotal += (uLightCol[i] * lambertCalc(vNormNorm, normalize(uLightPos[i] - vViewPosition)));
+		reflectBoi = normalize(reflect(vViewPosition - uLightPos[i], vNormNorm));
+		rtSpecularLightTotal += specCalc(view, reflectBoi);
 	}
+	 
+	// Perspective Divide
+	vec4 updatedDepthBuffer = texture(uImage00, vTexcoord.xy);
+	vec4 updatedPositionBuffer = texture(uImage01, vTexcoord.xy);
+	vec4 updatedNormalBuffer = texture(uImage02, vTexcoord.xy);
+	vec4 updatedTexcoordBuffer = texture(uImage03, vTexcoord.xy);
+	vec4 updatedDiffuseMapBuffer = texture(uImage04, vTexcoord.xy);
+	vec4 updatedSpecularMapBuffer = texture(uImage05, vTexcoord.xy);
 	
-	rtFragColor = (spec * texture(uTex_sm, vTexcoord.xy)) + (diffuse * texture(uTex_dm, vTexcoord.xy));
+	// Shadows :D
+	//float shadowSample = texture2D(uTex_shadow, postPerDiv.xy).r;
+	
+	//bool fragIsShadowed = (postPerDiv.z > (shadowSample));
+	
+	/*if(fragIsShadowed)
+	{
+		// Scale diffuse
+		diffuseTotal *= 0.2;
+	}*/
+	// Assigning each display target variable
+	rtSpecularLightTotal = vec4(rtSpecularLightTotal.xyz, 1.0);
+	rtDiffuseLightTotal = vec4(rtDiffuseLightTotal.xyz, 1.0);
+	rtDiffuseMapSample = texture(uImage04, vTexcoord.xy) * uPB_inv;
+	rtSpecularMapSample = texture(uImage05, vTexcoord.xy) * uPB_inv;
+	//rtFragColor = /*(rtSpecularLightTotal * rtSpecularMapSample) + (rtDiffuseLightTotal * rtDiffuseMapSample)*/;
 	
 	// DEBUGGING:
-	//rtFragColor = diffuse;
+	rtFragColor = updatedPositionBuffer;
 	//rtFragColor = spec;
 	//rtFragColor = uLightPos[1];
 	//rtFragColor = uLightCol[1];

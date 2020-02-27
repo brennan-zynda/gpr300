@@ -41,13 +41,6 @@ layout (location = 1) out vec4 rtViewPosition;
 layout (location = 2) out vec4 rtViewNormal;
 layout (location = 3) out vec4 rtAtlasTexcoord;
 
-vec4 updateNegatives(vec4 base)
-{
-	base += vec4(1.0);
-	base *= 0.5;
-	return base;
-}
-
 void main()
 {
 	// DUMMY OUTPUT: all fragments are OPAQUE RED, GREEN AND BLUE
