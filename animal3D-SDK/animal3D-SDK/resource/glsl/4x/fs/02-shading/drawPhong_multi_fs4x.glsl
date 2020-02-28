@@ -33,8 +33,51 @@
 
 out vec4 rtFragColor;
 
+uniform sampler2D uTex_dm;
+uniform sampler2D uTex_sm;
+uniform vec4 uLightPos[4];
+uniform vec4 uLightCol[4];
+uniform int uLightCt;
+
+in vec4 viewPos;
+in vec4 vNorm;
+in vec4 vTexcoord;
+
+float lambertCalc(vec4 N, vec4 L)
+{
+	float dotNL = dot(N, L);
+	return max(0.0, dotNL);
+}
+
+float specCalc(vec4 view, vec4 reflectBoi)
+{
+	float spec = pow(max(dot(view,reflectBoi), 0.0),32);
+	return spec;	
+}
+
 void main()
 {
-	// DUMMY OUTPUT: all fragments are OPAQUE GREEN
-	rtFragColor = vec4(0.0, 1.0, 0.0, 1.0);
+	//rtFragColor = vec4(1.0,0.0,0.0,1.0);
+	vec4 diffuse = vec4(0.0);
+	vec4 reflectBoi = vec4(0.0);
+	vec4 spec = vec4(0.0);
+	vec4 view = normalize(viewPos);
+	vec4 vNormNorm = normalize(vNorm);
+	for(int i = 0; i < uLightCt; i++)
+	{
+		diffuse += (uLightCol[i] * lambertCalc(vNormNorm, normalize(uLightPos[i] - viewPos)));
+		reflectBoi = normalize(reflect(viewPos - uLightPos[i], vNorm));
+		spec += specCalc(view, reflectBoi);
+	}
+	
+	rtFragColor = (spec * texture(uTex_sm, vTexcoord.xy)) + (diffuse * texture(uTex_dm, vTexcoord.xy));
+	
+	// DEBUGGING:
+	//rtFragColor = diffuse;
+	//rtFragColor = spec;
+	//rtFragColor = uLightPos[1];
+	//rtFragColor = uLightCol[1];
+	//rtFragColor = vTexcoord;
+	//rtFragColor = vNorm;
+	//rtFragColor = viewPos;
 }

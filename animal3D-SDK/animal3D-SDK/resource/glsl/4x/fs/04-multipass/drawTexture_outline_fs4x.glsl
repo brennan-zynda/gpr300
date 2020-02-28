@@ -28,10 +28,46 @@
 //	0) copy existing texturing shader
 //	1) implement outline algorithm - see render code for uniform hints
 
-out vec4 rtFragColor;
+// Algorithm found from https://en.wikipedia.org/wiki/Sobel_operator
+
+uniform sampler2D uTex_dm;
+
+layout (location = 0) out vec4 rtFragColor;
+
+layout (location = 3) in vec4 vTexCoord;
+
+mat3 sx = mat3( 
+    1.0, 2.0, 1.0, 
+    0.0, 0.0, 0.0, 
+   -1.0, -2.0, -1.0 
+);
+
+mat3 sy = mat3( 
+    1.0, 0.0, -1.0, 
+    2.0, 0.0, -2.0, 
+    1.0, 0.0, -1.0 
+);
 
 void main()
 {
-	// DUMMY OUTPUT: all fragments are OPAQUE DARK GREY
-	rtFragColor = vec4(0.2, 0.2, 0.2, 1.0);
+	mat3 I;
+	vec4 baseTex = texture(uTex_dm, vTexCoord.xy);
+	for(int i = 0; i < 3; i++)
+	{
+		for(int j = 0; j < 3; j++)
+		{
+			vec3 temp = texelFetch(uTex_dm, ivec2(gl_FragCoord) + ivec2(i-1,j-1),0).rgb;
+			I[i][j] = length(temp);
+		}
+	}
+	
+	float gx = dot(sx[0], I[0]) + dot(sx[1], I[1]) + dot(sx[2], I[2]);
+	float gy = dot(sy[0], I[0]) + dot(sy[1], I[1]) + dot(sy[2], I[2]);
+	
+	float g = sqrt(gx*gx + gy*gy);
+	
+	rtFragColor = vec4(baseTex.rgb - vec3(g),1.0);
+	
+	// DEBUGGING:
+	//rtFragColor = vTexCoord;
 }
