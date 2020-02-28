@@ -101,6 +101,8 @@ void main()
 	}
 	 
 	// Perspective Divide
+	// vec4 postPerDiv = vBiasedClipCoord / vBiasedClipCoord.w;
+	
 	vec4 updatedDepthBuffer = texture(uImage00, vTexcoord.xy);
 	vec4 updatedPositionBuffer = texture(uImage01, vTexcoord.xy);
 	vec4 updatedNormalBuffer = texture(uImage02, vTexcoord.xy);
@@ -121,12 +123,12 @@ void main()
 	// Assigning each display target variable
 	rtSpecularLightTotal = vec4(rtSpecularLightTotal.xyz, 1.0);
 	rtDiffuseLightTotal = vec4(rtDiffuseLightTotal.xyz, 1.0);
-	rtDiffuseMapSample = texture(uImage04, vTexcoord.xy) * uPB_inv;
-	rtSpecularMapSample = texture(uImage05, vTexcoord.xy) * uPB_inv;
+	rtDiffuseMapSample = updatedDiffuseMapBuffer;
+	rtSpecularMapSample = texture(uImage05, vTexcoord.xy);
 	//rtFragColor = /*(rtSpecularLightTotal * rtSpecularMapSample) + (rtDiffuseLightTotal * rtDiffuseMapSample)*/;
 	
 	// DEBUGGING:
-	rtFragColor = updatedPositionBuffer;
+	rtFragColor = vec4(1.0);
 	//rtFragColor = spec;
 	//rtFragColor = uLightPos[1];
 	//rtFragColor = uLightCol[1];
