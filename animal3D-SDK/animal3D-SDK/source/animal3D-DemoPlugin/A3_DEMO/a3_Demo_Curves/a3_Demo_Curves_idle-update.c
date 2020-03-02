@@ -76,18 +76,19 @@ void a3curves_update(a3_DemoState* demoState, a3_Demo_Curves* demoMode, a3f64 dt
 	//	a3vec4 m[2] = { 0 };
 
 		// ****TO-DO: 
-		//	-> update segment parameter - not done
+		//	-> update segment parameter - done
 		//		-> if animating, increment segment time in range [0, duration) - done
 		//		-> check if current segment time exceeded duration - done
 		//			-> correct segment time & index accordingly - done
 		//		-> update parameter in range [0, 1) - done
-		// update controller - ??? (not done)
-		//demoState->segmentParam = demoState->segmentIndex;
+		// update controller - done
+		demoState->segmentParam += demoState->segmentDurationInv;
 		if (demoState->updateAnimation)
 		{
 			demoState->segmentTime += 1;
 			if (demoState->segmentTime >= demoState->segmentDuration)
 			{
+				demoState->segmentParam = 0;
 				demoState->segmentIndex += 1;
 				if (demoState->segmentIndex >= demoState->segmentCount)
 				{
