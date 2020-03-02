@@ -51,17 +51,29 @@ in vbVertexData {
 	flat int vVertexID, vInstanceID, vModelID;
 } vVertexData[]; // Size 3 due to triangle input (can't define size), order goes (corresponding to above) 3,2,1,4,6
 
+// (3)
+uniform mat4 uP; // Projection Matrix
+uniform vec4 uColor; // Wireframe Color
+uniform int uFlag; // Flag for TB or WF
+uniform float uSize; // Tangent Base Size
+
 // (4)
 layout (line_strip, max_vertices = MAX_VERTICES) out; // triangle strip, line strip
 
 // (5)
 out vec4 vColor;
 
+// (6)
+void drawTangentBases()
+{
+	
+}
+
 // (7)
 void drawWireframe()
 {
 	// Color is orange
-	vColor = vec4(1.0,0.5,0.0,1.0);
+	vColor = uColor;
 	// Gets 4 vertices
 	gl_Position = gl_in[0].gl_Position;
 	EmitVertex();
@@ -76,5 +88,12 @@ void drawWireframe()
 
 void main()
 {
-	drawWireframe();
+	if(uFlag == 2)
+	{
+		drawWireframe();
+	}
+	else if(uFlag == 1)
+	{
+		drawTangentBases();
+	}	
 }

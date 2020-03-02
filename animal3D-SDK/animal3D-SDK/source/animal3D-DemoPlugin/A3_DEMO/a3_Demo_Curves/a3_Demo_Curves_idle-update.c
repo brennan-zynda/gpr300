@@ -82,7 +82,7 @@ void a3curves_update(a3_DemoState* demoState, a3_Demo_Curves* demoMode, a3f64 dt
 		//			-> correct segment time & index accordingly - done
 		//		-> update parameter in range [0, 1) - done
 		// update controller - ??? (not done)
-		//demoState->segmentParam += 1;
+		//demoState->segmentParam = demoState->segmentIndex;
 		if (demoState->updateAnimation)
 		{
 			demoState->segmentTime += 1;
