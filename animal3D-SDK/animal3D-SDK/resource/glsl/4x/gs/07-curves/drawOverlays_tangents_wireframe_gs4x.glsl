@@ -38,8 +38,8 @@
 //		-> optional: flags to decide whether or not to draw bases/wireframe
 //	4) declare output layout specifications
 //	5) declare outbound color
-//	6) draw tangent bases
-//	7) draw wireframe (SHIFT+F)
+//	6) draw tangent bases (SHIFT + B)
+//	7) draw wireframe (SHIFT + F)
 
 // (1)
 layout (triangles) in; // triangles, lines, points, lines adjacency, or triangles adjacency
@@ -65,8 +65,16 @@ out vec4 vColor;
 
 // (6)
 void drawTangentBases()
-{
-	
+{/*
+	gl_Position = gl_in[0].gl_Position * vVertexData[0].vTangentBasis_view * uP;
+	EmitVertex();
+	gl_Position = gl_in[1].gl_Position * vVertexData[1].vTangentBasis_view * uP;
+	EmitVertex();
+	gl_Position = gl_in[2].gl_Position * vVertexData[2].vTangentBasis_view * uP;
+	EmitVertex();
+	gl_Position = gl_in[0].gl_Position * vVertexData[0].vTangentBasis_view * uP;
+	EmitVertex();
+	EndPrimitive();*/
 }
 
 // (7)
