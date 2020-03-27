@@ -54,6 +54,8 @@ void a3curves_render_controls(a3_DemoState const* demoState, a3_Demo_Curves cons
 	// display mode info
 	a3byte const* pipelineText[curves_pipeline_max] = {
 		"Forward rendering",
+		"FSQ Pipeline Display",
+		"Looping Pipeline Display",
 	};
 
 	// forward pipeline names
@@ -253,9 +255,12 @@ void a3curves_render(a3_DemoState const* demoState, a3_Demo_Curves const* demoMo
 
 	// forward pipeline shader programs
 	const a3_DemoStateShaderProgram* renderProgram[curves_pipeline_max][curves_render_max] = {
-		{
-			demoState->prog_drawPhong_multi_forward_mrt,
-		},
+		
+		{ demoState->prog_drawPhong_multi_forward_mrt },
+		
+		{ demoState->prog_render_pipeline_full_screen },
+		{ demoState->prog_render_pipeline_looping },
+		
 	};
 
 	// display shader programs
@@ -386,6 +391,8 @@ void a3curves_render(a3_DemoState const* demoState, a3_Demo_Curves const* demoMo
 	{
 		// shading with MRT
 	case curves_forward:
+	case curves_display_full_pipeline:
+	case curves_display_looping_pipeline:
 		// target scene framebuffer
 		a3demo_setSceneState(currentWriteFBO, demoState->displaySkybox);
 		break;
@@ -423,7 +430,10 @@ void a3curves_render(a3_DemoState const* demoState, a3_Demo_Curves const* demoMo
 	switch (pipeline)
 	{
 		// scene pass using forward pipeline
-	case curves_forward: {
+	case curves_forward: 
+	case curves_display_full_pipeline:
+	case curves_display_looping_pipeline:
+	{
 		// activate shadow map and other relevant textures
 		currentReadFBO = demoState->fbo_shadow_d32;
 		a3framebufferBindDepthTexture(currentReadFBO, a3tex_unit06);

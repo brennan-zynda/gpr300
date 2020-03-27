@@ -431,7 +431,9 @@ void a3demo_loadShaders(a3_DemoState *demoState)
 			// 07-curves
 			a3_DemoStateShader
 				passTangentBasis_transform_instanced_vs[1];
-
+			// Midterm
+			a3_DemoStateShader
+				pass_render_targets_vs[1];
 			// geometry shaders
 			// 07-curves
 			a3_DemoStateShader
@@ -475,6 +477,10 @@ void a3demo_loadShaders(a3_DemoState *demoState)
 			// 07-curves
 			a3_DemoStateShader
 				drawPhong_multi_forward_mrt_fs[1];
+			// Midterm
+			a3_DemoStateShader
+				draw_pipeline_full_screen[1],
+				draw_pipeline_looping[1];
 		};
 	} shaderList = {
 		{
@@ -500,6 +506,9 @@ void a3demo_loadShaders(a3_DemoState *demoState)
 			{ { { 0 },	"shdr-vs:pass-biasedclip-inst",		a3shader_vertex  ,	1,{ A3_DEMO_VS"06-deferred/e/passBiasedClipCoord_transform_instanced_vs4x.glsl" } } },
 			// 07-curves
 			{ { { 0 },	"shdr-vs:pass-tangent-trans-inst",	a3shader_vertex  ,	1,{ A3_DEMO_VS"07-curves/passTangentBasis_transform_instanced_vs4x.glsl" } } },
+
+			// Pipeline Tool (Midterm)
+			{ { { 0 }, "shdr-vs:pass-render-targets",		a3shader_vertex  ,  1, { A3_DEMO_VS"midterm/pass_render_targets_vs4x.glsl" } } },
 
 			// gs
 			// 07-curves
@@ -536,6 +545,9 @@ void a3demo_loadShaders(a3_DemoState *demoState)
 			{ { { 0 },	"shdr-fs:draw-Phong-composite",		a3shader_fragment,	1,{ A3_DEMO_FS"06-deferred/e/drawPhongComposite_fs4x.glsl" } } },
 			// 07-curves
 			{ { { 0 },	"shdr-fs:draw-Phong-mul-fwd-mrt",	a3shader_fragment,	1,{ A3_DEMO_FS"07-curves/drawPhong_multi_forward_mrt_fs4x.glsl" } } },
+			// Midterm
+			{ { { 0 }, "shdr-fs:draw-pipeline-full",		a3shader_fragment,  1,{ A3_DEMO_FS"midterm/draw_pipeline_full_screen_fs4x.glsl" } } },
+			{ { { 0 }, "shdr-fs:draw-pipeline-looping",		a3shader_fragment,  1,{ A3_DEMO_FS"midterm/draw_pipeline_looping_f24x.glsl" } } },
 		}
 	};
 	a3_DemoStateShader *const shaderListPtr = (a3_DemoStateShader *)(&shaderList), *shaderPtr;
@@ -717,6 +729,17 @@ void a3demo_loadShaders(a3_DemoState *demoState)
 	a3shaderProgramAttachShader(currentDemoProg->program, shaderList.drawCurveSegment_gs->shader);
 	a3shaderProgramAttachShader(currentDemoProg->program, shaderList.drawColorAttrib_fs->shader);
 
+	// Midterm programs:
+	// draw FSQ pipeline tool
+	currentDemoProg = demoState->prog_render_pipeline_full_screen;
+	a3shaderProgramCreate(currentDemoProg->program, "prog:draw-FSQ-pipeline");
+	a3shaderProgramAttachShader(currentDemoProg->program, shaderList.pass_render_targets_vs->shader);
+	a3shaderProgramAttachShader(currentDemoProg->program, shaderList.draw_pipeline_full_screen->shader);
+	// draw looping pipeline tool
+	currentDemoProg = demoState->prog_render_pipeline_looping;
+	a3shaderProgramCreate(currentDemoProg->program, "prog:draw-looping-pipeline");
+	a3shaderProgramAttachShader(currentDemoProg->program, shaderList.pass_render_targets_vs->shader);
+	a3shaderProgramAttachShader(currentDemoProg->program, shaderList.draw_pipeline_looping->shader);
 
 	// activate a primitive for validation
 	// makes sure the specified geometry can draw using programs

@@ -85,7 +85,8 @@ extern "C"
 	enum a3_Demo_Curves_PipelineName
 	{
 		curves_forward,				// forward lighting pipeline
-
+		curves_display_full_pipeline, // shows full FSQ of pipeline
+		curves_display_looping_pipeline, // shows FSQ updating to show process of rendering
 		curves_pipeline_max
 	};
 
