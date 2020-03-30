@@ -430,8 +430,53 @@ void a3curves_render(a3_DemoState const* demoState, a3_Demo_Curves const* demoMo
 	switch (pipeline)
 	{
 		// scene pass using forward pipeline
-	case curves_forward: 
+	
 	case curves_display_full_pipeline:
+	{
+		// activate shadow map and other relevant textures
+		currentReadFBO = demoState->fbo_shadow_d32;
+		a3framebufferBindDepthTexture(currentReadFBO, a3tex_unit06);
+		a3textureActivate(demoState->tex_earth_dm, a3tex_unit07);
+
+		// send more common uniforms
+		a3shaderUniformSendInt(a3unif_single, currentDemoProgram->uLightCt, 1, &demoState->forwardLightCount);
+		a3shaderUniformBufferActivate(demoState->ubo_transformStack_model, 0);
+		a3shaderUniformBufferActivate(demoState->ubo_pointLight, 4);
+
+		// Midterm Addition
+		a3i32 currentScreenPass = 0;
+		a3i32 maxPasses = 8;
+		a3i32 currentRow = -1, currentColumn = 0;
+		a3shaderUniformSendInt(a3unif_single, currentDemoProgram->uFlag, 1, &currentScreenPass);
+		for (currentScreenPass; currentScreenPass < maxPasses; currentScreenPass++)
+		{
+			currentColumn = currentScreenPass % 3;
+			if (currentColumn == 0)
+			{
+				currentRow++;
+			}
+			//glViewport(currentColumn * (currentReadFBO->frameWidth / 3), (currentScreenPass % 3) * (currentReadFBO->frameHeight / 3), currentReadFBO->frameWidth / 3, currentReadFBO->frameHeight / 3);
+
+
+			// individual object requirements: 
+			//	- modelviewprojection
+			//	- modelview
+			//	- modelview for normals
+			//	- per-object animation data
+			for (currentSceneObject = demoState->planeObject, endSceneObject = demoState->teapotObject,
+				j = (a3ui32)(currentSceneObject - demoState->sceneObject), k = 0;
+				currentSceneObject <= endSceneObject;
+				++j, ++k, ++currentSceneObject)
+			{
+				// send data and draw
+				a3textureActivate(texture_dm[k], a3tex_unit00);
+				a3textureActivate(texture_sm[k], a3tex_unit01);
+				a3shaderUniformSendInt(a3unif_single, currentDemoProgram->uIndex, 1, &j);
+				a3vertexDrawableActivateAndRender(drawable[k]);
+			}
+		}
+	}	break;
+	case curves_forward:
 	case curves_display_looping_pipeline:
 	{
 		// activate shadow map and other relevant textures
@@ -492,6 +537,8 @@ void a3curves_render(a3_DemoState const* demoState, a3_Demo_Curves const* demoMo
 	switch (pipeline)
 	{
 	case curves_forward:
+	case curves_display_full_pipeline:
+	case curves_display_looping_pipeline:
 		// use simple texturing program
 		currentDemoProgram = demoState->prog_drawTexture;
 		a3shaderProgramActivate(currentDemoProgram->program);

@@ -159,7 +159,7 @@ void main()
 	// DUMMY OUTPUT: all fragments are colored based on model index
 //	vec4 color[6] = vec4[6] ( vec4(1.0, 0.0, 0.0, 1.0), vec4(1.0, 1.0, 0.0, 1.0), vec4(0.0, 1.0, 0.0, 1.0), vec4(0.0, 1.0, 1.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0), vec4(1.0, 0.0, 1.0, 1.0) );
 //	rtFragColor = color[vModelID % 6];
-
+	vec4 totalOut;
 	mat4 tangentBasis_view = mat4(
 		normalize(vTangentBasis_view[0]),
 		normalize(vTangentBasis_view[1]),
